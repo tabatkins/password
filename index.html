@@ -4,17 +4,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
-	width: 200px;
 	font-family: sans-serif;
-}
-
-body > h1 {
-	font-size: medium;
-	text-align: center;
-}
-
-#site-tag, #master-key, #hash-word {
-	width: 150px;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
 }
 
 #hash-word {
@@ -25,6 +18,8 @@ fieldset {
 	border: none;
 	background: #eee;
 	margin-top: .5em;
+	display: flex;
+	flex-flow: column;
 }
 
 legend {
@@ -57,15 +52,15 @@ fieldset.size > ul {
 <form>
 	<fieldset>
 		<legend>Site Tag</legend>
-		<input id="site-tag" autofocus>
+		<input type=text id="site-tag" autofocus>
 	</fieldset>
 	<fieldset>
 		<legend>Master Key</legend>
-		<input id="master-key" type="password">
+		<input type=text id="master-key" type="password">
 	</fieldset>
 	<fieldset>
 		<legend>Hash Word</legend>
-		<input id="hash-word">
+		<input type=text id="hash-word">
 		<div class='buttons'>
 			<button type=button onclick='generatePassword(12)'>Short</button>
 			<button type=button onclick='generatePassword(26)'>Long</button>
