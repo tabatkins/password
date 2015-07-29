@@ -1,8 +1,7 @@
-
 <!DOCTYPE HTML>
 <title>Password Hasher</title>
 <meta charset='utf-8'>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
 	width: 200px;
@@ -33,6 +32,15 @@ legend {
 	padding: 1px;
 }
 
+fieldset .buttons {
+	display: flex;
+	padding-top: .5em;
+}
+
+fieldset .buttons > button {
+	flex: 1 auto;
+}
+
 fieldset > ul {
 	margin: 0;
 	padding: 0;
@@ -46,7 +54,6 @@ fieldset.size > ul {
 }
 </style>
 
-<h1>Password Hasher</h1>
 <form>
 	<fieldset>
 		<legend>Site Tag</legend>
@@ -59,11 +66,14 @@ fieldset.size > ul {
 	<fieldset>
 		<legend>Hash Word</legend>
 		<input id="hash-word">
-		<button type=button onclick='generateShortPassword()'>Short</button>
-		<button type=button onclick='generateLongPassword()'>Long</button>
+		<div class='buttons'>
+			<button type=button onclick='generatePassword(12)'>Short</button>
+			<button type=button onclick='generatePassword(26)'>Long</button>
+		</div>
 	</fieldset>
 	<details>
 		<summary>More Options</summary>
+		<p><button type=button onclick='generatePassword(8)'>Unsafe 8 Character</button></p>
 		<p><button type=button onclick='generateCustomPassword()'>Generate Custom</button></p>
 		<fieldset>
 			<legend>Requirements</legend>
@@ -108,23 +118,12 @@ function validate(form) {
 	return find('#site-tag').value && find('#master-key').value;
 }
 
-function generateShortPassword() {
+function generatePassword(len) {
 	var hashword = find('#hash-word');
 	hashword.value = PassHashCommon.generateHashWord(
 		find('#site-tag').value,
 		find('#master-key').value,
-		8,true,false,true,true,false
-	);
-	hashword.select();
-	hashword.focus();
-}
-
-function generateLongPassword() {
-	var hashword = find('#hash-word');
-	hashword.value = PassHashCommon.generateHashWord(
-		find('#site-tag').value,
-		find('#master-key').value,
-		26,true,false,true,true,false
+		len,true,false,true,true,false
 	);
 	hashword.select();
 	hashword.focus();
