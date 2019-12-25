@@ -1,29 +1,53 @@
+
 <!DOCTYPE HTML>
 <title>Password Hasher</title>
 <meta charset='utf-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+:root {
+	--bg: white;
+	--fg: black;
+	--accent-bg: #eee;
+	--button-bg: #ddd;
+	--input-bg: white;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: black;
+		--fg: #ccc;
+		--accent-bg: #111;
+		--button-bg: #222;
+		--input-bg: #222;
+	}
+}
 body {
 	font-family: sans-serif;
 	display: flex;
 	flex-flow: column;
 	align-items: center;
+	background: var(--bg);
+	color: var(--fg);
+	color-scheme: light dark;
 }
 
 #hash-word {
 	font-family: monospace;
 }
 
+input[type=text], input[type=password], input:not([type]) {
+	width: 175px;
+}
+
 fieldset {
 	border: none;
-	background: #eee;
+	background: var(--accent-bg);
 	margin-top: .5em;
 	display: flex;
 	flex-flow: column;
 }
 
 legend {
-	background: #eee;
+	background: var(--accent-bg);
 	padding: 1px;
 }
 
@@ -46,6 +70,19 @@ fieldset.size > ul {
 	-webkit-columns: 2;
 	-moz-columns: 2;
 	columns: 2;
+}
+
+@supports not (color-scheme: dark) {
+	input {
+		background: var(--input-bg);
+		color: var(--fg);
+		border-color: var(--accent-bg);
+	}
+	button {
+		background: var(--button-bg);
+		color: var(--fg);
+		border-color: var(--accent-bg);
+	}
 }
 </style>
 
@@ -74,7 +111,7 @@ fieldset.size > ul {
 			<legend>Requirements</legend>
 			<ul>
 				<li><label><input type="checkbox" id="digit" checked> Digits</label></li>
-				<li><label><input type="checkbox" id="punctuation"> Punctuation</label></li>
+				<li><label><input type="checkbox" id="punctuation" checked> Punctuation</label></li>
 				<li><label><input type="checkbox" id="mixedCase" checked> Mixed Case</label></li>
 			</ul>
 		</fieldset>
@@ -90,9 +127,9 @@ fieldset.size > ul {
 			<ul>
 				<li><label><input type=radio name=size value=4> 4</label></li>
 				<li><label><input type=radio name=size value=6> 6</label></li>
-				<li><label><input type=radio name=size value=8 checked> 8</label></li>
+				<li><label><input type=radio name=size value=8> 8</label></li>
 				<li><label><input type=radio name=size value=10> 10</label></li>
-				<li><label><input type=radio name=size value=12> 12</label></li>
+				<li><label><input type=radio name=size value=12 checked> 12</label></li>
 				<li><label><input type=radio name=size value=14> 14</label></li>
 				<li><label><input type=radio name=size value=16> 16</label></li>
 				<li><label><input type=radio name=size value=18> 18</label></li>
