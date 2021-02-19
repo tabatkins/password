@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <title>Password Hasher</title>
 <meta charset='utf-8'>
@@ -22,12 +21,16 @@
 }
 body {
 	font-family: sans-serif;
+	font-size: 18px;
 	display: flex;
 	flex-flow: column;
-	align-items: center;
+	align-items: stretch;
 	background: var(--bg);
 	color: var(--fg);
 	color-scheme: light dark;
+	width: 240px;
+	margin: 0 auto;
+	gap: .5em;
 }
 
 #hash-word {
@@ -35,29 +38,35 @@ body {
 }
 
 input[type=text], input[type=password], input:not([type]) {
-	width: 175px;
+	width: 100%;
 }
 
 fieldset {
 	border: none;
 	background: var(--accent-bg);
 	margin-top: .5em;
+	border-radius: 5px;
 	display: flex;
 	flex-flow: column;
+	gap: .5em;
+	align-items: center;
 }
 
 legend {
 	background: var(--accent-bg);
-	padding: 1px;
+	padding: 1px 5px;
+	border-radius: 3px;
 }
 
 fieldset .buttons {
 	display: flex;
-	padding-top: .5em;
+	gap: 1em;
+	align-self: stretch;
 }
 
 fieldset .buttons > button {
 	flex: 1 auto;
+	font-size: 16px;
 }
 
 fieldset > ul {
@@ -67,8 +76,6 @@ fieldset > ul {
 }
 
 fieldset.size > ul {
-	-webkit-columns: 2;
-	-moz-columns: 2;
 	columns: 2;
 }
 
@@ -84,24 +91,30 @@ fieldset.size > ul {
 		border-color: var(--accent-bg);
 	}
 }
+
+body > details[open] {
+    align-self: center;
+    width: 500px;
+    max-width: 100vw;
+}
 </style>
 
 <form>
-	<fieldset>
-		<legend>Site Tag</legend>
+	<fieldset title="A non-secure, easy-to-remember 'name' for this password">
+		<legend>Password Name</legend>
 		<input type=text id="site-tag" autofocus>
 	</fieldset>
-	<fieldset>
+	<fieldset title="A secure, hard-to-guess master password you use for everything.">
 		<legend>Master Key</legend>
 		<input id="master-key" type="password">
 	</fieldset>
-	<fieldset>
-		<legend>Hash Word</legend>
-		<input type=text id="hash-word">
+	<fieldset title="Generates the same every time you use the same Password Name and Master Key.">
+		<legend>Generated Password</legend>
 		<div class='buttons'>
-			<button type=button onclick='generatePassword(12)'>Short</button>
-			<button type=button onclick='generatePassword(26)'>Long</button>
+			<button type=button onclick='generatePassword(12)' title="12 characters">Short</button>
+			<button type=button onclick='generatePassword(26)' title="26 characters">Long</button>
 		</div>
+		<input type=text id="hash-word">
 	</fieldset>
 	<details>
 		<summary>More Options</summary>
@@ -141,6 +154,67 @@ fieldset.size > ul {
 		</fieldset>
 	</details>
 </form>
+<details>
+	<summary>How do I use this?</summary>
+	<p>
+		This is a secure password generator that doesn't store any information whatsoever.
+		Using this site, you don't need to use a "password locker"
+		or anything else that might lose your passwords.
+		You can save it to your own computer so you have access to it even if my website disappears;
+		it's a single-page, totally self-contained app,
+		with the only external file being a small script to make it available when you're offline.
+
+	<p>
+		To use, first come up with a secure "Master Password".
+		This can be anything you want, but it needs to be a <em>really good</em> password:
+		random letters and numbers, decent length, the whole jazz.
+		Write this down somewhere secure until you memorize it;
+		if you forget this, you won't be able to access any of your passwords.
+		You'll use this Master Password for <em>all</em> your passwords;
+		it's the only secure password you'll ever have to remember again.
+	<p>
+		Then, whenever you need a new password for something,
+		come up with a "Password Name" for it.
+		This should <em>not</em> be secure and random;
+		it should instead be easy to remember later.
+		For example, if I need to make a password for my Google account,
+		I can just use "google" as the Password Name.
+	<p>
+		Then hit "Short" if you want a 12-character password,
+		or "Long" if you want a 26-character password.
+		<em>Most</em> websites will accept a 26-character password,
+		and it's vastly more secure,
+		so use that whenever you can;
+		the 12-character option is for the occasional badly-written site
+		with maximum password lengths.
+	<p>
+		Every time you use the same Password Name and Master Password,
+		it'll generate the exact same password,
+		so you don't need to write down what it generates.
+		Just memorize your Master Password
+		and keep your Password Names easy to remember
+		(and write them down somewhere, too!)
+		and you can get your passwords from anywhere.
+	<p>
+		If the Short and Long buttons don't work
+		(some sites are <em>really</em> badly designed
+		and have asinine requirements on what your password must contain),
+		click "More Options" and select exactly what you need:
+		whether the password requires digits, punctuation, or uppercase letters;
+		whether it needs to have <em>no</em> punctuation or be only digits (for a PIN number);
+		and what length you want.
+		Then click "Generate Custom" to get your custom password.
+	<p>
+		I recommend saving your Site Tags somewhere you can easily access them,
+		in case you forget.
+		These do <em>not</em> need to be secure,
+		so feel free to use a notebook,
+		or a Google Doc,
+		or anything else like that.
+		This will also let you record if a site had special requirements for their password
+		that required you to use Short or custom options,
+		since you need to set the exact same options every time.
+</details>
 
 <script>
 function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
@@ -151,14 +225,20 @@ function validate(form) {
 }
 
 function generatePassword(len) {
-	var hashword = find('#hash-word');
-	hashword.value = PassHashCommon.generateHashWord(
+	const hashword = find('#hash-word');
+	const pw = PassHashCommon.generateHashWord(
 		find('#site-tag').value,
 		find('#master-key').value,
 		len,true,false,true,true,false
 	);
+	hashword.value = pw;
 	hashword.select();
 	hashword.focus();
+	if (navigator.clipboard) {
+		navigator.clipboard.writeText(pw);
+	} else {
+		console.warn('Cannot copy to clipboard');
+	}
 }
 
 function update() {
@@ -171,17 +251,17 @@ function update() {
 }
 
 function generateCustomPassword() {
-	var siteTag   = find('#site-tag');
-	var masterKey = find('#master-key');
-	var hashWord  = find('#hash-word');
-	var submit    = find('#submit');
-	var requireDigit       = find("#digit").checked;
-	var requirePunctuation = find("#punctuation").checked;
-	var requireMixedCase   = find("#mixedCase").checked;
-	var restrictSpecial    = find("#noSpecial").checked;
-	var restrictDigits     = find("#digitsOnly").checked;
-	var hashWordSize = Number(find("input[name='size']:checked").value);
-	hashWord.value = PassHashCommon.generateHashWord(
+	const siteTag   = find('#site-tag');
+	const masterKey = find('#master-key');
+	const hashWord  = find('#hash-word');
+	const submit    = find('#submit');
+	const requireDigit       = find("#digit").checked;
+	const requirePunctuation = find("#punctuation").checked;
+	const requireMixedCase   = find("#mixedCase").checked;
+	const restrictSpecial    = find("#noSpecial").checked;
+	const restrictDigits     = find("#digitsOnly").checked;
+	const hashWordSize = Number(find("input[name='size']:checked").value);
+	const pw = PassHashCommon.generateHashWord(
 	                   siteTag.value,
 	                   masterKey.value,
 	                   hashWordSize,
@@ -190,8 +270,14 @@ function generateCustomPassword() {
 	                   requireMixedCase,
 	                   restrictSpecial,
 	                   restrictDigits);
+	hashWord.value = pw;
 	hashWord.select();
 	hashWord.focus();
+	if (navigator.clipboard) {
+		navigator.clipboard.writeText(pw);
+	} else {
+		console.warn('Cannot copy to clipboard');
+	}
 }
 
 window.onload = function() {
@@ -199,6 +285,12 @@ window.onload = function() {
 		el.onclick = update;
 	});
 };
+
+window.addEventListener("load", () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+});
 </script>
 
 <script>
