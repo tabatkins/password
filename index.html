@@ -205,7 +205,7 @@ body > details[open] {
 		and what length you want.
 		Then click "Generate Custom" to get your custom password.
 	<p>
-		I recommend saving your Site Tags somewhere you can easily access them,
+		I recommend saving your Password Names somewhere you can easily access them,
 		in case you forget.
 		These do <em>not</em> need to be secure,
 		so feel free to use a notebook,
@@ -221,14 +221,14 @@ function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
 function find(sel) { return document.querySelector(sel); }
 
 function validate(form) {
-	return find('#site-tag').value && find('#master-key').value;
+	return find('#site-tag').value.strip() && find('#master-key').value.strip();
 }
 
 function generatePassword(len) {
 	const hashword = find('#hash-word');
 	const pw = PassHashCommon.generateHashWord(
-		find('#site-tag').value,
-		find('#master-key').value,
+		find('#site-tag').value.strip(),
+		find('#master-key').value.strip(),
 		len,true,false,true,true,false
 	);
 	hashword.value = pw;
@@ -262,8 +262,8 @@ function generateCustomPassword() {
 	const restrictDigits     = find("#digitsOnly").checked;
 	const hashWordSize = Number(find("input[name='size']:checked").value);
 	const pw = PassHashCommon.generateHashWord(
-	                   siteTag.value,
-	                   masterKey.value,
+	                   siteTag.value.strip(),
+	                   masterKey.value.strip(),
 	                   hashWordSize,
 	                   requireDigit,
 	                   requirePunctuation,
