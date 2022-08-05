@@ -221,14 +221,14 @@ function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
 function find(sel) { return document.querySelector(sel); }
 
 function validate(form) {
-	return find('#site-tag').value.strip() && find('#master-key').value.strip();
+	return find('#site-tag').value.trim() && find('#master-key').value.trim();
 }
 
 function generatePassword(len) {
 	const hashword = find('#hash-word');
 	const pw = PassHashCommon.generateHashWord(
-		find('#site-tag').value.strip(),
-		find('#master-key').value.strip(),
+		find('#site-tag').value.trim(),
+		find('#master-key').value.trim(),
 		len,true,false,true,true,false
 	);
 	hashword.value = pw;
@@ -262,8 +262,8 @@ function generateCustomPassword() {
 	const restrictDigits     = find("#digitsOnly").checked;
 	const hashWordSize = Number(find("input[name='size']:checked").value);
 	const pw = PassHashCommon.generateHashWord(
-	                   siteTag.value.strip(),
-	                   masterKey.value.strip(),
+	                   siteTag.value.trim(),
+	                   masterKey.value.trim(),
 	                   hashWordSize,
 	                   requireDigit,
 	                   requirePunctuation,
