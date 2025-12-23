@@ -41,6 +41,17 @@ input[type=text], input[type=password], input:not([type]) {
 	width: 100%;
 }
 
+#checksum.content {
+	font-size: smaller;
+
+	&::before {
+		content: "(";
+	}
+	&::after {
+		content: ")";
+	}
+}
+
 fieldset {
 	border: none;
 	background: var(--accent-bg);
@@ -96,6 +107,11 @@ body > details[open] {
     align-self: center;
     width: 500px;
     max-width: 100vw;
+    padding: .5em 1em;
+}
+
+details#faq {
+	text-align: justify;
 }
 </style>
 
@@ -104,8 +120,8 @@ body > details[open] {
 		<legend>Password Name</legend>
 		<input type=text id="site-tag" autofocus>
 	</fieldset>
-	<fieldset title="A secure, hard-to-guess master password you use for everything.">
-		<legend>Master Key</legend>
+	<fieldset title="A secure, hard-to-guess master key you use for everything.">
+		<legend>Master Key <u id=checksum title="Checksum for your master key. It will always show the same value if you've typed your master key correctly."></u></legend>
 		<input id="master-key" type="password">
 	</fieldset>
 	<fieldset title="Generates the same every time you use the same Password Name and Master Key.">
@@ -116,23 +132,23 @@ body > details[open] {
 		</div>
 		<input type=text id="hash-word">
 	</fieldset>
-	<details>
+	<details id=more-options>
 		<summary>More Options</summary>
 		<p><button type=button onclick='generatePassword(8)'>Unsafe 8 Character</button></p>
 		<p><button type=button onclick='generateCustomPassword()'>Generate Custom</button></p>
 		<fieldset>
 			<legend>Requirements</legend>
 			<ul>
-				<li><label><input type="checkbox" id="digit" checked> Digits</label></li>
-				<li><label><input type="checkbox" id="punctuation" checked> Punctuation</label></li>
-				<li><label><input type="checkbox" id="mixedCase" checked> Mixed Case</label></li>
+				<li><label><input type="checkbox" id="digit" checked title="At least one digit 0-9"> Digits</label></li>
+				<li><label><input type="checkbox" id="punctuation" checked title="At least one 'special' character, chosen from !&quot;#$%&amp;&apos;()*+,-./"> Punctuation</label></li>
+				<li><label><input type="checkbox" id="mixedCase" checked title="Both uppercase and lowercase letters"> Mixed Case</label></li>
 			</ul>
 		</fieldset>
 		<fieldset>
 			<legend>Restrictions</legend>
 			<ul>
-				<li><label><input type="checkbox" id="noSpecial"> No Special</label></li>
-				<li><label><input type="checkbox" id="digitsOnly"> Digits Only</label></li>
+				<li><label><input type="checkbox" id="noSpecial" title="No 'special' punctuation characters."> No Special</label></li>
+				<li><label><input type="checkbox" id="digitsOnly" title="Only digits in the password, like a PIN code."> Digits Only</label></li>
 			</ul>
 		</fieldset>
 		<fieldset class='size'>
@@ -154,29 +170,29 @@ body > details[open] {
 		</fieldset>
 	</details>
 </form>
-<details>
+<details id=faq>
 	<summary>How do I use this?</summary>
 	<p>
 		This is a secure password generator that doesn't store any information whatsoever.
 		Using this site, you don't need to use a "password locker"
 		or anything else that might lose your passwords.
-		You can save it to your own computer so you have access to it even if my website disappears;
-		it's a single-page, totally self-contained app,
-		with the only external file being a small script to make it available when you're offline.
-
+		You can save it to your own computer so you have access to it even if this website disappears;
+		it's a single-page, totally self-contained app.
 	<p>
-		To use, first come up with a secure "Master Password".
+		To use, first come up with a secure "Master Key".
 		This can be anything you want, but it needs to be a <em>really good</em> password:
 		random letters and numbers, decent length, the whole jazz.
 		Write this down somewhere secure until you memorize it;
 		if you forget this, you won't be able to access any of your passwords.
-		You'll use this Master Password for <em>all</em> your passwords;
+		You'll use this Master Key for <em>all</em> your passwords;
 		it's the only secure password you'll ever have to remember again.
+		(If you want, you can just mash random keys in the first two fields,
+		then hit "Short" to generate a good strong password for yourself.)
 	<p>
 		Then, whenever you need a new password for something,
 		come up with a "Password Name" for it.
 		This should <em>not</em> be secure and random;
-		it should instead be easy to remember later.
+		it should instead be <strong>easy to remember later</strong>.
 		For example, if I need to make a password for my Google account,
 		I can just use "google" as the Password Name.
 	<p>
@@ -188,13 +204,21 @@ body > details[open] {
 		the 12-character option is for the occasional badly-written site
 		with maximum password lengths.
 	<p>
-		Every time you use the same Password Name and Master Password,
+		Every time you use the same Password Name and Master Key,
 		it'll generate the exact same password,
 		so you don't need to write down what it generates.
-		Just memorize your Master Password
+		Just memorize your Master Key
 		and keep your Password Names easy to remember
 		(and write them down somewhere, too!)
 		and you can get your passwords from anywhere.
+	<p>
+		When typing your Master Key, a small "checksum" phrase
+		will appear above the text field.
+		This random-looking phrase will always be the same
+		if your Master Key is the same,
+		so you can remember it
+		and later be certain that you typed your Master Key correctly
+		if the phrase matches.
 	<p>
 		If the Short and Long buttons don't work
 		(some sites are <em>really</em> badly designed
@@ -217,6 +241,7 @@ body > details[open] {
 </details>
 
 <script>
+"use strict";
 function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
 function find(sel) { return document.querySelector(sel); }
 
@@ -229,7 +254,8 @@ function generatePassword(len) {
 	const pw = PassHashCommon.generateHashWord(
 		find('#site-tag').value.trim(),
 		find('#master-key').value.trim(),
-		len,true,false,true,true,false
+		len,
+		{digits:true, mixedCase:true, punctuation:"none"}
 	);
 	hashword.value = pw;
 	hashword.select();
@@ -262,14 +288,15 @@ function generateCustomPassword() {
 	const restrictDigits     = find("#digitsOnly").checked;
 	const hashWordSize = Number(find("input[name='size']:checked").value);
 	const pw = PassHashCommon.generateHashWord(
-	                   siteTag.value.trim(),
-	                   masterKey.value.trim(),
-	                   hashWordSize,
-	                   requireDigit,
-	                   requirePunctuation,
-	                   requireMixedCase,
-	                   restrictSpecial,
-	                   restrictDigits);
+		siteTag.value.trim(),
+		masterKey.value.trim(),
+		hashWordSize,
+		{
+			digits: restrictDigits ? "only" : requireDigit,
+			punctuation: restrictSpecial ? "none" : requirePunctuation,
+			mixedCase: requireMixedCase,
+		},
+	);
 	hashWord.value = pw;
 	hashWord.select();
 	hashWord.focus();
@@ -280,17 +307,112 @@ function generateCustomPassword() {
 	}
 }
 
+function updateChecksum() {
+	const checksumEl = find("#checksum");
+	const pw = find("#master-key").value.trim();
+	if(!pw) {
+		checksumEl.textContent = "";
+		checksumEl.classList.remove("content");
+	} else {
+		const checksumNum = +PassHashCommon.generateHashWord("master key checksum", pw, 4, {digits: "only"});
+		const checksum = createChecksum(checksumNum);
+		checksumEl.textContent = checksum;
+		checksumEl.classList.add("content");
+	}
+}
+
+function createChecksum(x) {
+	const d_lo = x % 36;
+	const d_hi = Math.floor(x / 36) % 36;
+	return heximalDigitName(d_hi) + " " + heximalDigitName(d_lo);
+}
+
+function heximalDigitName(x) {
+	x = x % 36;
+	const l0 = "pbtdkg";
+	const l1 = "aeiou";
+	const l2 = ["m", "f", "v", "n", "s", "z", "ng"];
+	const l3 = ["a", "e", "i", "o", "u", "er"];
+	return l0[x%6] + l1[x%5] + l2[x%7] + l3[Math.floor(x/6)];
+}
+
+
 window.onload = function() {
 	findAll("input[type='radio'], input[type='checkbox']").forEach(function(el){
 		el.onclick = update;
 	});
+	find("#master-key").addEventListener("input", updateChecksum);
 };
 
+/*
 window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js");
   }
 });
+*/
+</script>
+
+<script>
+"use strict";
+/* Tests to verify that the hasher is working as expected. */
+
+const testFunctions = {
+	testShort() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 12, {digits:true, mixedCase:true, punctuation:"none"});
+		return assert("Short (12) standard options", "DJRRXBXl1VuK", pw);
+	},
+	testLong() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 26, {digits:true, mixedCase:true, punctuation:"none"});
+		return assert("Long (26) standard options", "DJRRXBXlCVuKh6ULoN87847QXE", pw);
+	},
+	testBlank() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 26);
+		return assert("Long (26) with no options", "DJRRXBXlCVuKh6ULoN87847QX+", pw);
+	},
+	testDigits() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 4, {digits:true});
+		return assert("Require a digit", "2JRR", pw);
+	},
+	testSpecial() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 4, {punctuation:true});
+		return assert("Require a punctuation", "D.RR", pw);
+	},
+	testMixedCase() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 4, {mixedCase:true});
+		return assert("Require mixed case", "DJIi", pw);
+	},
+	testNoSpecial() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 26, {punctuation:"none"});
+		return assert("Require no punctuation", "DJRRXBXlCVuKh6ULoN87847QXE", pw);
+	},
+	testOnlyDigits() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 26, {digits:"only"});
+		return assert("Require all digits", "28662022101986805287847027", pw);
+	},
+	testAllReqs() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 6, {digits:true, punctuation:true, mixedCase:true});
+		return assert("Require digit, punctuation, and mixed case.", "DJ6'Xs", pw);
+	},
+	testAllReqsSatisfied() {
+		const pw = PassHashCommon.generateHashWord("test", "test", 26, {digits:true, punctuation:true, mixedCase:true});
+		return assert("Require digit, punctuation, and mixed case, when the password already contains them all.", "DJRRXBXlCVuKh6ULoN87847QX+", pw);
+	}
+
+}
+
+function assert(msg, expected, actual) {
+	if(expected === actual) return true;
+	console.error(`Failed test!\n * ${msg}\n * Expected: ${expected}\n * Actual:   ${actual}`);
+	return false;
+}
+
+function runTests(fns) {
+	for(const fn of Object.values(fns)) {
+		fn();
+	}
+}
+window.addEventListener("load", ()=>runTests(testFunctions));
 </script>
 
 <script>
@@ -574,12 +696,20 @@ var PassHashCommon =
 								siteTag,
 								masterKey,
 								hashWordSize,
-								requireDigit,
-								requirePunctuation,
-								requireMixedCase,
-								restrictSpecial,
-								restrictDigits)
+								{
+									digits = false, // false, true, "only"
+									punctuation = false, // false, true, "none"
+									mixedCase = false // false, true
+								} = {},
+		)
 		{
+				// Require at least one digit in the output.
+				const requireDigit = digits === true;
+				// Require at least one "special character" in the output.
+				const requirePunctuation = punctuation === true;
+				const requireMixedCase = !!mixedCase;
+				const restrictSpecial = punctuation == "none";
+				const restrictDigits = digits == "only";
 				// Start with the SHA1-encrypted master key/site tag.
 				var s = b64_hmac_sha1(masterKey, siteTag);
 				// Use the checksum of all characters as a pseudo-randomizing seed to
